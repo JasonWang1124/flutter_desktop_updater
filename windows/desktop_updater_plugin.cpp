@@ -138,7 +138,7 @@ namespace desktop_updater
     // Update createBatFile call with parameters
     createBatFile(updateDir, destDir, executable_path);
 
-    // 3. .bat dosyasını çalıştır
+    // Run the batch file
     runBatFile();
 
     // Exit the current process
@@ -252,8 +252,36 @@ namespace desktop_updater
       }
       else
       {
-        result->Error("VersionError", "Invalid version format.");
+        result->Error("VersionError", "Unable to parse build number from version string.");
       }
+    }
+    else if (method_call.method_name().compare("fileExists") == 0)
+    {
+      const auto *arguments = std::get_if<flutter::EncodableMap>(method_call.arguments());
+      if (arguments == nullptr)
+      {
+        result->Error("InvalidArguments", "Arguments must be a map.");
+        return;
+      }
+
+      auto pathIt = arguments->find(flutter::EncodableValue("path"));
+      if (pathIt == arguments->end() || !std::holds_alternative<std::string>(pathIt->second))
+      {
+        result->Error("InvalidArguments", "Path must be a string.");
+        return;
+      }
+
+      std::string pathStr = std::get<std::string>(pathIt->second);
+
+      // Convert UTF-8 path to wide string for Windows API
+      int pathSize = MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, NULL, 0);
+      std::wstring widePath(pathSize, 0);
+      MultiByteToWideChar(CP_UTF8, 0, pathStr.c_str(), -1, &widePath[0], pathSize);
+
+      // Use PathFileExistsW to check if the file exists
+      bool exists = PathFileExistsW(widePath.c_str()) != 0;
+
+      result->Success(flutter::EncodableValue(exists));
     }
     else
     {
@@ -261,4 +289,4 @@ namespace desktop_updater
     }
   }
 
-} // namespace desktop_updater
+} // namespace desktop_updater 

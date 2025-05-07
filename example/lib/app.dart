@@ -22,9 +22,7 @@ class _HomePageState extends State<HomePage> {
     initPlatformState();
 
     _desktopUpdaterController = DesktopUpdaterController(
-      appArchiveUrl: Uri.parse(
-        "https://www.yoursite.com/app-archive.json",
-      ),
+      appArchiveUrl: Uri.file("../example.json"),
       localization: const DesktopUpdateLocalization(
         updateAvailableText: "Update available",
         newVersionAvailableText: "{} {} is available",

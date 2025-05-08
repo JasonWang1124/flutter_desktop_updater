@@ -138,7 +138,7 @@ namespace desktop_updater
     // Update createBatFile call with parameters
     createBatFile(updateDir, destDir, executable_path);
 
-    // 3. .bat dosyasını çalıştır
+    // 3. .bat 
     runBatFile();
 
     // Exit the current process
